@@ -1,6 +1,6 @@
 
 #include <stdio.h>
-#include <gsl>
+#include <gsl.h>
 
 
 int main(int argc, char **argv){
@@ -9,6 +9,7 @@ int main(int argc, char **argv){
   float *posY;
   float *G;
   float *GT;
+  float *v;
   
 
   int n_row = 0;
@@ -91,9 +92,17 @@ float * construirG(float *data, int *nf){
     }
 
 //Función que trasponer
-float * transpose(float *G, int *nf){
+float * transpose(float *G, float *v, int *nf){
 
+  n_lines = *nf;
+  
   GT = malloc(n_lines*3*sizeof(float));
+  v = gsl_vector * gsl_vector_alloc (size_t n); 
+
+  for(i = 0; i < n_lines; i++){
+    int gsl_matrix_get_col (gsl_vector * v, const gsl_matrix * m, size_t j);
+  }
+
 }
    
 //organized_data =  organize_data(datos, nfilas, ncolumnas)
