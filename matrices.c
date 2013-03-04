@@ -20,7 +20,7 @@ int main(int argc, char **argv){
   gsl_matrix *inverse;
   gsl_vector *Vgsl;
 
-  int lines ;
+  int lines = 0;
   int columnas = 2;
 
 
@@ -63,9 +63,9 @@ do{
     }
   }while(c!=EOF);
 
- 	*Original = gsl_matrix_calloc (n_lines, 2);
+ 	Original = gsl_matrix_calloc (n_lines, 2);
  	gsl_matrix_fscanf (file, Original);
-	lines=n_lines;
+	lines = n_lines;
 /**
  rewind(file);
 
@@ -94,7 +94,7 @@ void *construirY(gsl_matrix *Original, int *nf){
 	int i;
   for(i = 0; i<n_lines; i++){
     
- gsl_matrix_set (posYgsl, i, gsl_matrix_get(Original, 2i + 1)) //grandes dudas con este codigo 
+    gsl_matrix_set (posYgsl, i, gsl_matrix_get(Original, 2i + 1)); //grandes dudas con este codigo 
 
    // posYgsl[i] = Original[2i + 1]
       
@@ -138,12 +138,12 @@ void * transpose(gsl_matrix *Ggsl, gsl_matrix GTgsl, int *nf){
   //for(j = 0; j < n_lines; j++){
   //  int gsl_matrix_get_col(gsl_vector *v, const gsl_matrix *m, size_t j);
 
-gsl_matrix_transpose_memcpy (gsl_matrix *GTgsl, const gsl_matrix *Ggsl);
+gsl_matrix_transpose_memcpy(gsl_matrix *GTgsl, const gsl_matrix *Ggsl);
 
   }
 
 //Funcion para multiplicar G y su traspuesta
-void GtimesGtranspose(gsl_matrix *Ggsl, gsl_matrix *GTgsl, gsl_matriz *GtimeGTgsl){
+void GtimesGtranspose(gsl_matrix *Ggsl, gsl_matrix *GTgsl, gsl_matrix *GtimeGTgsl){
 
 gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, Ggsl, GTgsl, 0.0, GtimeGTgsl);
 }
@@ -151,9 +151,9 @@ gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, Ggsl, GTgsl, 0.0, GtimeGTgsl);
 //Funcion que invierte GtimesGtranspose
 void invert (gsl_matrix *GtimeGTgsl, gsl_matrix *inverse){
 
-gsl_linalg_LU_decomp(GtimeGTgsl, gsl_permutation *p, int *signum)//no termino de entender este metodo
+  gsl_linalg_LU_decomp(GtimeGTgsl, gsl_permutation *p, int *signum);//no termino de entender este metodo
 
-gsl_linalg_LU_invert (const gsl_matrix *LU, const gsl_permutation *p,inverse)
+  gsl_linalg_LU_invert (const gsl_matrix *LU, const gsl_permutation *p,inverse);
 }
 
 //GtimesGtranspose times Gtranspose, then times Y
@@ -162,7 +162,7 @@ void Final (gsl_matrix *inverse, gsl_matrix *GTgsl,gsl_vector *posYgsl, int *nf)
 *nf = lines;
 Vgsl = gsl_vector_alloc (size_t lines);
 gsl_matrix *temp;
-gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, inverse, GTgsl, 0.0, temp);}
+gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, inverse, GTgsl, 0.0, temp);
 
 gsl_blas_dgemv (CblasNoTrans, 1.0, temp, posYgsl, 0.0, Vgsl);
 
@@ -175,10 +175,12 @@ void print_file (gsl_vector *Vgsl)
 	output = fopen("parametros_movimiento.dat", "w");
 	
 	fprintf(output, "%f %f %f" ,gsl_vector_get (Vgsl, 0), gsl_vector_get (Vgsl, 1) ,gsl_vector_get (Vgsl, 2));
+
+	output = fclose();
 	
 }
 
-}
+
    
 //organized_data =  organize_data(datos, nfilas, ncolumnas)
 
