@@ -11,13 +11,13 @@ int main(int argc, char **argv){
   //float *posY;
   gsl_vector *posYgsl;
   //float *G;
-  gsl_matrix *Original
+  gsl_matrix *Original;
   gsl_matrix *Ggsl;
   //float *GT;
   gsl_matrix *GTgsl;
   //float *V;
   gsl_matrix *GtimeGTgsl;
-  gsl_matriz *inverse;
+  gsl_matrix *inverse;
   gsl_vector *Vgsl;
 
   int lines ;
@@ -26,17 +26,17 @@ int main(int argc, char **argv){
 
  	
 
-  *datos = load_data(*filein, &lines, &columnas);
+ // *datos = load_data(*filein, &lines, &columnas);
 
-  *posYgsl = construirY(&Original, &lines);
+  //*posYgsl = construirY(&Original, &lines);
 
-  *Ggsl = construirGgsl(&Original, &lines);
+  //*Ggsl = construirGgsl(&Original, &lines);
 
   transpose(&Ggsl, &GTgsl, &lines);
 
 GtimesGtranspose(&Ggsl, &GTgsl, &GtimeGTgsl);
 
-invert(&GtimeGTgsl);
+invert(&GtimeGTgsl, &inverse);
 
 Final (&inverse, &GTgsl, &posYgsl, &columnas);
 
@@ -46,7 +46,7 @@ print_file(&Vgsl);
 
 
 //Funcion que carga los datos del archivo y los dispone en una matriz 'Original'
-void *load_data( char *filein, int *nf, int *nc){
+void *load_data( char *filein, int *nf, int *nc,int argc, char **argv ){
   //float *data;
   FILE *file;
   file = fopen(argv[1], "r");
@@ -149,7 +149,7 @@ gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, Ggsl, GTgsl, 0.0, GtimeGTgsl);
 }
 
 //Funcion que invierte GtimesGtranspose
-void invert (gsl_matrix *GtimeGTgsl){
+void invert (gsl_matrix *GtimeGTgsl, gsl_matrix *inverse){
 
 gsl_linalg_LU_decomp(GtimeGTgsl, gsl_permutation *p, int *signum)//no termino de entender este metodo
 
