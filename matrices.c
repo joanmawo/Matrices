@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <gsl/gsl_math.h>
 #include <gsl/gsl_matrix.h>
-#include<gsl/gsl_blas.h>
+#include <gsl/gsl_blas.h>
 #include <gsl/gsl_linalg.h>
 
 int main(int argc, char **argv){
@@ -60,9 +60,6 @@ do{
 
 
 
-
-  
-
 	posYgsl = gsl_vector_calloc(lines);
 	int i;
   for(i = 0; i<n_lines; i++){
@@ -109,6 +106,9 @@ FILE *output;
 	output = fopen("parametros_movimiento.dat", "w");
 	
 	fprintf(output, "%f %f %f" ,gsl_vector_get (Vgsl, 0), gsl_vector_get (Vgsl, 1) ,gsl_vector_get (Vgsl, 2));
+
+
+	return 1;
 
 }
 
