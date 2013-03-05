@@ -18,99 +18,79 @@ int main(int argc, char **argv){
   gsl_vector *Vgsl;
 
   int lines = 0;
-  
+  int i;  
+  float temp1, temp2, temp3;
 
-FILE *file;
+  FILE *file;
   file = fopen(argv[1], "r");
 
   int n_lines = 0;
   int columnas = 2;
   int c=0;
 
-do{
+  do{
     c = fgetc(file);
     if(c=='\n'){
       n_lines++;
     }
   }while(c!=EOF);
 
-rewind(file);
-
- 	Original = gsl_matrix_calloc (n_lines, 2);
- 	gsl_matrix_fscanf (file, Original);
-	lines = n_lines;
+  rewind(file);
+  
+  Original = gsl_matrix_calloc (n_lines, 2);
+  gsl_matrix_fscanf (file, Original);
+  lines = n_lines;
  	
+  fprintf(stdout, "n_lines %d\n", n_lines);
 
-  //*datos = load_data(file, &n_lines, &columnas);
-
-  //*posYgsl = construirY(&Original, &lines);
-
-  //*Ggsl = construirGgsl(&Original, &lines);
-
-  //transpose(&Ggsl, &GTgsl, &lines);
-
-//GtimesGtranspose(&Ggsl, &GTgsl, &GtimeGTgsl);
-
-//invert(&GtimeGTgsl, &inverse);
-
-//Final (&inverse, &GTgsl, &posYgsl, &columnas);
-
-//print_file(&Vgsl);
-
-
-
-
-
-
-	posYgsl = gsl_vector_calloc(lines);
-	int i;
-  for(i = 0; i<n_lines; i++){
-    
-    gsl_matrix_set (posYgsl, i,0, gsl_matrix_get(Original, i,1)); 
-
+  posYgsl = gsl_vector_calloc(lines);
   Ggsl = gsl_matrix_alloc(n_lines, 3);
-	int i;
-}
+
+  for(i = 0; i<n_lines; i++){    
+    gsl_vector_set (posYgsl, i, gsl_matrix_get(Original, i,0));     
+  }
+
   for(i = 0; i<n_lines; i++){
     
-    float temp1 = 1;
-    float temp2 = gsl_matrix_get(Original,i, 1);
-    float temp3 = (1/2)*gsl_matrix_get(Original,i, 2)*gsl_matrix_get(Original,i, 2);
-
-
+    temp1 = 1;
+    temp2 = gsl_matrix_get(Original,i, 0);
+    temp3 = (1/2)*gsl_matrix_get(Original,i, 0)*gsl_matrix_get(Original,i, 0);
+    
     gsl_matrix_set(Ggsl, i, 0, temp1);
     gsl_matrix_set(Ggsl, i, 1, temp2);
     gsl_matrix_set(Ggsl, i, 2, temp3);
-
-}
-
+  }
+  
 
   GTgsl = gsl_matrix_alloc(3, lines);
 
- gsl_matrix_transpose_memcpy(GTgsl,Ggsl);
- gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, Ggsl, GTgsl, 0.0, GtimeGTgsl);
- 
+  gsl_matrix_transpose_memcpy(GTgsl,Ggsl);
 
-gsl_matrix *LU;
-gsl_permutation *p=gsl_permutation_alloc (3);
-int signum;
+  GtimeGTgsl = gsl_matrix_alloc(3, 3);
+  gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, GTgsl, Ggsl, 0.0, GtimeGTgsl);
 
+  fprintf(stdout, "n_lines %d\n", n_lines);  
+
+  gsl_matrix *LU;
+  gsl_permutation *p=gsl_permutation_alloc (3);
+  int signum;
+  
   gsl_linalg_LU_decomp(GtimeGTgsl, p, &signum);
-  gsl_linalg_LU_invert(GtimeGTgsl,p,inverse);
+  gsl_linalg_LU_invert(GtimeGTgsl, p, inverse);
+  
+  Vgsl = gsl_vector_alloc (lines);
+  gsl_matrix *temp;
+  gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, inverse, GTgsl, 0.0, temp);
 
-Vgsl = gsl_vector_alloc (lines);
-gsl_matrix *temp;
-gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1.0, inverse, GTgsl, 0.0, temp);
+  gsl_blas_dgemv (CblasNoTrans, 1.0, temp, posYgsl, 0.0, Vgsl);
 
-gsl_blas_dgemv (CblasNoTrans, 1.0, temp, posYgsl, 0.0, Vgsl);
-
-FILE *output;
-	output = fopen("parametros_movimiento.dat", "w");
-	
-	fprintf(output, "%f %f %f" ,gsl_vector_get (Vgsl, 0), gsl_vector_get (Vgsl, 1) ,gsl_vector_get (Vgsl, 2));
-
-
-	return 1;
+  FILE *output;
+  output = fopen("parametros_movimiento.dat", "w");
+  
+  fprintf(output, "%f %f %f" ,gsl_vector_get (Vgsl, 0), gsl_vector_get (Vgsl, 1) ,gsl_vector_get (Vgsl, 2));
+  
+  
+  return 1;
 
 }
 

@@ -1,4 +1,3 @@
-
 #include <stdio.h>
 #include <gsl/gsl_math.h>
 #include <gsl/gsl_matrix.h>
@@ -6,6 +5,9 @@
 #include <gsl/gsl_linalg.h>
 #include <gsl/gsl_eigen.h>
 #include <gsl/gsl_cblas.h>
+
+void imprimir(gsl_matrix* eigenVec, int N);
+int count_lines(char *filename);
 
 int main(int argc, char ** argv){
 
@@ -31,19 +33,41 @@ int main(int argc, char ** argv){
   eigenVal = gsl_vector_calloc(columnas);
   Vgsl = gsl_vector_calloc(lineas);
 
+  
+  //Ejecucion de las funciones
+  
+  gsl_matrix_fscanf(file, datos);
+  
+  construirMatrizCovarianzas(datos, covarianzas, columnas, lineas);
+  
+  calcularAutovalores(covarianzas, eigenVal, eigenVec, columnas);
+  
+  imprimir(eigenVec, columnas);
+  
+  return 1;
+}  
+  
+  //Funcion que cuenta el numero de lineas del archivo
+  int count_lines(char *filename){
+    FILE *in;
+  int n_lines;
+  int c;
+  if(!(in=fopen(filename, "r"))){
+    printf("problem opening file %s\n", filename);
+    exit(1);
+  }
 
-	//Ejecucion de las funciones
-	
-	gsl_matrix_fscanf(file, datos);
-
-	construirMatrizCovarianzas(datos, covarianzas, columnas, lineas);
-
-	calcularAutovalores(covarianzas, eigenVal, eigenVec, columnas);
-
-	imprimir(eigenVec, columnas);
-
-	return 1;
-
+  n_lines = 0;
+  do{
+    c = fgetc(in);
+    if(c=='\n'){
+      n_lines++;
+    }
+  }while(c!=EOF);
+  
+  fclose(in);
+  return n_lines;
+}
 
 	//Funcion que cuenta el numero de lineas del archivo
 int count_lines(char *filename){
@@ -140,14 +164,15 @@ void calcularAutovalores(gsl_matrix* covarianzas, gsl_vector* eigenVal, gsl_matr
 //Funcion que imprime el archivo con los autovectores ordenados decrecientemente
 
 void imprimir(gsl_matrix* eigenVec, int N){
-
-FILE *output;
-	output = fopen("autovectores_3D_data.dat", "w");
-	
-	int i;
-	for(i = 0; i < N; i ++){
-	fprintf(output, "%f %f %f \n" , gsl_matrix_get(eigenVec, i, 0), gsl_matrix_get(eigenVec, i, 1) ,gsl_matrix_get(eigenVec, i, 2));
-	}
+  
+  FILE *output;
+  output = fopen("autovectores_3D_data.dat", "w");
+  
+  int i;
+  for(i = 0; i < N; i ++){
+    fprintf(output, "%f %f %f \n" , 
+	    gsl_matrix_get(eigenVec, i, 0), gsl_matrix_get(eigenVec, i, 1) ,gsl_matrix_get(eigenVec, i, 2));
+  }
 }
 
-}
+
