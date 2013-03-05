@@ -1,4 +1,12 @@
 
+#include <stdio.h>
+#include <gsl/gsl_math.h>
+#include <gsl/gsl_matrix.h>
+#include <gsl/gsl_blas.h>
+#include <gsl/gsl_linalg.h>
+#include <gsl/gsl_eigen.h>
+#include <gsl/gsl_cblas.h>
+
 int main(int argc, char ** argv){
 
   FILE* file;
@@ -12,8 +20,7 @@ int main(int argc, char ** argv){
   gsl_matrix *eigenVec;
   gsl_vector *eigenVal;
   gsl_vector *Vgsl;
-  gsl_vector *promediosColumnas;
-  gsl_vector *promediosLineas;
+ 
 
   columnas = 3;
   lineas = count_lines(argv[1]);
@@ -27,27 +34,29 @@ int main(int argc, char ** argv){
 
 	//Ejecucion de las funciones
 	
-	gsl_matrix_fscanf(file, &datos);
+	gsl_matrix_fscanf(file, datos);
 
-	construirMatrizCovarianzas(&datos, &covarianzas, columnas, lineas);
+	construirMatrizCovarianzas(datos, covarianzas, columnas, lineas);
 
-	calcularAutovalores(&covarianzas, &eigenVal, &eigenVec, columnas);
+	calcularAutovalores(covarianzas, eigenVal, eigenVec, columnas);
 
-	imprimir(&eigenVec, columnas);
+	imprimir(eigenVec, columnas);
 
 	return 1;
 
-}
+
   //Funcion que calcula promedios de componentes de vectores dandole como parametros el vector y su tamano.
-  double calcularPromedio(gsl_vector* V, int t){
+  double calcularPromedio(gsl_vector* V, int M){
 
     double temp = 0.0;
+    double promedio = 0.0;
     int j;
-    for(j = 0; j < t; j ++){
+    for(j = 0; j < M; j ++){
 	temp += gsl_vector_get(V, j);      
     }
-       
-    return = (temp/t);
+    
+    promedio = (temp/M);
+    return promedio;
   }
 
 //Funcion que calcula la covarianza de un elemento
@@ -60,20 +69,19 @@ double calcularCovarianza(int i, int j, int M, gsl_matrix* datos){
 	gsl_matrix_get_col(datos_j, datos, j);
 
 	int k;	
-	double covarianza;
-	covarianza = 0.0;
-	for (k = 0 ; k < M ; k++)
-	{	
-	double d_ik = gsl_vector_get(d_i,k);
-	double d_jk = gsl_vector_get(d_j,k);
+	double cov;
+	cov = 0.0;
+	for (k = 0 ; k < M ; k++){	
+	double d_ik = gsl_vector_get(datos_i,k);
+	double d_jk = gsl_vector_get(datos_j,k);
 	
 
-	covarianza +=((d_ik - calcularPromedio(datos_i,M))*(d_jk - calcularPromedio(d_j, M)));
+	cov +=((d_ik - calcularPromedio(datos_i,M))*(d_jk - calcularPromedio(datos_j, M)));
 	}
 
-	covarianza = covarianza/(M-1);
+	cov = cov/(M-1);
 
-	return covarianza;
+	return cov;
 }
 
 //Funcion que construye la matriz cuadrada con las covarianzas	
@@ -97,12 +105,14 @@ int calcularAutovalores(gsl_matrix* covarianzas, gsl_vector* eigenVal, gsl_matri
 	gsl_eigen_symm_workspace *w;
 	w = gsl_eigen_symm_alloc (N);
 
-	//int gsl_eigen_symm(covarianzas, eigenVal, w);
-	int gsl_eigen_symmv(covarianzas, eigenVal, eigenVec, w)
+	//gsl_eigen_symm(covarianzas, eigenVal, w);
+	gsl_eigen_symmv(covarianzas, eigenVal, eigenVec, w);
 
-	int gsl_eigen_symmv_sort(eigenVal, eigenVec, GSL_EIGEN_SORT_ABS_DESC);
+	gsl_eigen_symmv_sort(eigenVal, eigenVec, GSL_EIGEN_SORT_ABS_DESC);
 	
-	void gsl_eigen_symmv_free(w);
+	gsl_eigen_symmv_free(w);
+
+	return 1;
 }
  
 //Funcion que imprime el archivo con los autovectores ordenados decrecientemente
@@ -118,3 +128,4 @@ FILE *output;
 	}
 }
 
+}
