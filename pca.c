@@ -1,7 +1,7 @@
 
 int main(int argc, char ** argv){
 
-  FILE * file;
+  FILE* file;
   file = fopen(argv[1], "r");
 
   int lineas;
@@ -12,10 +12,8 @@ int main(int argc, char ** argv){
   gsl_matrix *eigenVec;
   gsl_vector *eigenVal;
   gsl_vector *Vgsl;
-gsl_vector *promediosColumnas;
-gsl_vector *promediosLineas;
-
-
+  gsl_vector *promediosColumnas;
+  gsl_vector *promediosLineas;
 
   columnas = 3;
   lineas = count_lines(argv[1]);
@@ -25,9 +23,17 @@ gsl_vector *promediosLineas;
   eigenVec = gsl_matrix_calloc(columnas, columnas);
   eigenVal = gsl_vector_calloc(columnas);
   Vgsl = gsl_vector_calloc(lineas);
-promediosColumnas = gsl_vector_calloc(columnas);
-promediosLineas = gsl_vector_calloc(lineas);
 
+
+	//Ejecucion de las funciones
+	
+	gsl_matrix_fscanf(file, datos);
+
+	construirMatrizCovarianzas(datos, covarianzas, columnas, lineas);
+
+	calcularAutovalores(covarianzas, eigenVal, eigenVec, columnas);
+
+	imprimir(eigenVec, columnas);
 
 }
   //Funcion que calcula promedios de componentes de vectores dandole como parametros el vector y su tamano.
@@ -69,7 +75,7 @@ double calcularCovarianza(int i, int j, int M, gsl_matrix* datos){
 }
 
 //Funcion que construye la matriz cuadrada con las covarianzas	
-int construirMatrizCovarianza(gsl_matrix* datos, gsl_matrix* covarianzas, int N, int M){
+int construirMatrizCovarianzas(gsl_matrix* datos, gsl_matrix* covarianzas, int N, int M){
 
 	int i;
 	int j;
@@ -83,7 +89,7 @@ int construirMatrizCovarianza(gsl_matrix* datos, gsl_matrix* covarianzas, int N,
 	}
 }
 
-//Funcion que calcula los autovalores de la matriz de covarianza
+//Funcion que calcula los autovalores de la matriz de covarianza y los ordena decrecientemente
 int calcularAutovalores(gsl_matrix* covarianzas, gsl_vector* eigenVal, gsl_matrix* eigenVec, int N){
 
 	gsl_eigen_symm_workspace *w;
@@ -92,8 +98,21 @@ int calcularAutovalores(gsl_matrix* covarianzas, gsl_vector* eigenVal, gsl_matri
 	//int gsl_eigen_symm(covarianzas, eigenVal, w);
 	int gsl_eigen_symmv(covarianzas, eigenVal, eigenVec, w)
 
+	int gsl_eigen_symmv_sort(eigenVal, eigenVec, GSL_EIGEN_SORT_ABS_DESC);
+	
 	void gsl_eigen_symmv_free(w);
 }
  
-//Funcion que
+//Funcion que imprime el archivo con los autovectores ordenados decrecientemente
+
+void imprimir(gsl_matrix* eigenVec, int N){
+
+FILE *output;
+	output = fopen("autovectores_3D_data.dat", "w");
+	
+	int i;
+	for(i = 0; i < N; i ++){
+	fprintf(output, "%f %f %f \n" , gsl_matrix_get(eigenVec, i, 0), gsl_matrix_get(eigenVec, i, 1) ,gsl_matrix_get(eigenVec, i, 2));
+	}
+}
 
