@@ -45,6 +45,28 @@ int main(int argc, char ** argv){
 	return 1;
 
 
+	//Funcion que cuenta el numero de lineas del archivo
+int count_lines(char *filename){
+  FILE *in;
+  int n_lines;
+  int c;
+  if(!(in=fopen(filename, "r"))){
+    printf("problem opening file %s\n", filename);
+    exit(1);
+  }
+
+  n_lines = 0;
+  do{
+    c = fgetc(in);
+    if(c=='\n'){
+      n_lines++;
+    }
+  }while(c!=EOF);
+  
+  fclose(in);
+  return n_lines;
+}
+
   //Funcion que calcula promedios de componentes de vectores dandole como parametros el vector y su tamano.
   double calcularPromedio(gsl_vector* V, int M){
 
@@ -59,7 +81,7 @@ int main(int argc, char ** argv){
     return promedio;
   }
 
-//Funcion que calcula la covarianza de un elemento
+//Funcion que calcula la covarianza de un par de  elementos
 double calcularCovarianza(int i, int j, int M, gsl_matrix* datos){
 
 
@@ -85,7 +107,7 @@ double calcularCovarianza(int i, int j, int M, gsl_matrix* datos){
 }
 
 //Funcion que construye la matriz cuadrada con las covarianzas	
-int construirMatrizCovarianzas(gsl_matrix* datos, gsl_matrix* covarianzas, int N, int M){
+void construirMatrizCovarianzas(gsl_matrix* datos, gsl_matrix* covarianzas, int N, int M){
 
 	int i;
 	int j;
@@ -100,7 +122,7 @@ int construirMatrizCovarianzas(gsl_matrix* datos, gsl_matrix* covarianzas, int N
 }
 
 //Funcion que calcula los autovalores de la matriz de covarianza y los ordena decrecientemente
-int calcularAutovalores(gsl_matrix* covarianzas, gsl_vector* eigenVal, gsl_matrix* eigenVec, int N){
+void calcularAutovalores(gsl_matrix* covarianzas, gsl_vector* eigenVal, gsl_matrix* eigenVec, int N){
 
 	gsl_eigen_symm_workspace *w;
 	w = gsl_eigen_symm_alloc (N);
@@ -112,7 +134,7 @@ int calcularAutovalores(gsl_matrix* covarianzas, gsl_vector* eigenVal, gsl_matri
 	
 	gsl_eigen_symmv_free(w);
 
-	return 1;
+	
 }
  
 //Funcion que imprime el archivo con los autovectores ordenados decrecientemente
