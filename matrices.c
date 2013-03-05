@@ -41,32 +41,12 @@ rewind(file);
 	lines = n_lines;
  	
 
-  //*datos = load_data(file, &n_lines, &columnas);
-
-  //*posYgsl = construirY(&Original, &lines);
-
-  //*Ggsl = construirGgsl(&Original, &lines);
-
-  //transpose(&Ggsl, &GTgsl, &lines);
-
-//GtimesGtranspose(&Ggsl, &GTgsl, &GtimeGTgsl);
-
-//invert(&GtimeGTgsl, &inverse);
-
-//Final (&inverse, &GTgsl, &posYgsl, &columnas);
-
-//print_file(&Vgsl);
-
-
-
-
-
 
 	posYgsl = gsl_vector_calloc(lines);
 	int i;
   for(i = 0; i<n_lines; i++){
     
-    gsl_matrix_set (posYgsl, i,0, gsl_matrix_get(Original, i,1)); 
+    gsl_vector_set (posYgsl, i,gsl_matrix_get(Original, i,1)); 
 
   Ggsl = gsl_matrix_alloc(n_lines, 3);
 	int i;
