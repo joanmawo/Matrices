@@ -12,6 +12,10 @@ int main(int argc, char ** argv){
   gsl_matrix *eigenVec;
   gsl_vector *eigenVal;
   gsl_vector *Vgsl;
+gsl_vector *promediosColumnas;
+gsl_vector *promediosLineas;
+
+
 
   columnas = 3;
   lineas = count_lines(argv[1]);
@@ -21,21 +25,75 @@ int main(int argc, char ** argv){
   eigenVec = gsl_matrix_calloc(columnas, columnas);
   eigenVal = gsl_vector_calloc(columnas);
   Vgsl = gsl_vector_calloc(lineas);
+promediosColumnas = gsl_vector_calloc(columnas);
+promediosLineas = gsl_vector_calloc(lineas);
 
-  //Funcion que calcula promedios de componentes de vectores
-  double calcularPromedio(gsl_vector *Vgsl, gsl_matrix *datos){
+
+}
+  //Funcion que calcula promedios de componentes de vectores dandole como parametros el vector y su tamano.
+  double calcularPromedio(gsl_vector* V, int t){
 
     double temp = 0.0;
     int j;
-    for(j = 0; j < lineas; j ++){
-      gsl_matrix_get_col(Vgsl, datos, j);
+    for(j = 0; j < t; j ++){
+	temp += gsl_vector_get(V, j);      
     }
-    for(j = 0; j < lineas; j ++){
-      temp += gsl_vector_get(Vgsl, j);
-    }
-   
-    return = (temp/lineas);
+       
+    return = (temp/t);
   }
 
- 
+//Funcion que calcula la covarianza de un elemento
+double calcularCovarianza(int i, int j, int M, gsl_matrix* datos){
+
+
+	gsl_vector* datos_i = gsl_vector_calloc(M);
+	gsl_vector* datos_j = gsl_vector_calloc(M);
+	gsl_matrix_get_col(datos_i, datos, i);
+	gsl_matrix_get_col(datos_j, datos, j);
+
+	int k;	
+	double covarianza;
+	covarianza = 0.0;
+	for (k = 0 ; k < M ; k++)
+	{	
+	double d_ik = gsl_vector_get(d_i,k);
+	double d_jk = gsl_vector_get(d_j,k);
+	
+
+	covarianza +=((d_ik - calcularPromedio(datos_i,M))*(d_jk - calcularPromedio(d_j, M)));
+	}
+
+	covarianza = covarianza/(M-1);
+
+	return covarianza;
 }
+
+//Funcion que construye la matriz cuadrada con las covarianzas	
+int construirMatrizCovarianza(gsl_matrix* datos, gsl_matrix* covarianzas, int N, int M){
+
+	int i;
+	int j;
+
+	for(i = 0; i < N; i ++){
+		for(j = 0; j < N; j ++){
+			double temp;
+			temp = calcularCovarianza(i, j, M, datos);
+			gsl_matrix_set(covarianzas, i, j, temp);
+		}
+	}
+}
+
+//Funcion que calcula los autovalores de la matriz de covarianza
+int calcularAutovalores(gsl_matrix* covarianzas, gsl_vector* eigenVal, gsl_matrix* eigenVec, int N){
+
+	gsl_eigen_symm_workspace *w;
+	w = gsl_eigen_symm_alloc (N);
+
+	//int gsl_eigen_symm(covarianzas, eigenVal, w);
+	int gsl_eigen_symmv(covarianzas, eigenVal, eigenVec, w)
+
+	void gsl_eigen_symmv_free(w);
+}
+ 
+//Funcion que
+
