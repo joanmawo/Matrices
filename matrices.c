@@ -34,6 +34,8 @@ do{
     }
   }while(c!=EOF);
 
+rewind(file);
+
  	Original = gsl_matrix_calloc (n_lines, 2);
  	gsl_matrix_fscanf (file, Original);
 	lines = n_lines;
