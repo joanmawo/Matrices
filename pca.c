@@ -27,13 +27,15 @@ int main(int argc, char ** argv){
 
 	//Ejecucion de las funciones
 	
-	gsl_matrix_fscanf(file, datos);
+	gsl_matrix_fscanf(file, &datos);
 
-	construirMatrizCovarianzas(datos, covarianzas, columnas, lineas);
+	construirMatrizCovarianzas(&datos, &covarianzas, columnas, lineas);
 
-	calcularAutovalores(covarianzas, eigenVal, eigenVec, columnas);
+	calcularAutovalores(&covarianzas, &eigenVal, &eigenVec, columnas);
 
-	imprimir(eigenVec, columnas);
+	imprimir(&eigenVec, columnas);
+
+	return 1;
 
 }
   //Funcion que calcula promedios de componentes de vectores dandole como parametros el vector y su tamano.
